@@ -13,4 +13,4 @@ const getInput = () => {
   }
 }
 
-console.table(getInput())
+console.log(getInput())
