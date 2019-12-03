@@ -1,3 +1,5 @@
+// prompt - https://adventofcode.com/2019/day/2
+
 const fs = require('fs')
 
 const getInput = () => {
