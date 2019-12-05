@@ -13,15 +13,12 @@ const getInput = () => {
   }
 }
 
-function drawLines() {
+function solve() {
 
-    let line1 = `R75,D30,R83,U83,L12,D49,R71,U7,L72`
-    let line2 = `U62,R66,U55,R34,D71,R55,D58,R83`
+    let line1 = getInput()['line1']
+    let line2 = getInput()['line2']
 
-    // let line1 = getInput().line1
-    // let line2 = getInput().line2
-
-    let line1Directions = line1.split(',').map((instruction)=>{
+    let line1Directions = line1.map((instruction)=>{
         let direction = instruction.slice(0, 1)
         let distance = instruction.split(/[RLUD]/)[1]
         return {
@@ -31,7 +28,7 @@ function drawLines() {
     }
     )
 
-    let line2Directions = line2.split(',').map((instruction)=>{
+    let line2Directions = line2.map((instruction)=>{
         let direction = instruction.slice(0, 1)
         let distance = instruction.split(/[RLUD]/)[1]
         return {
@@ -41,6 +38,7 @@ function drawLines() {
     }
     )
 
+    // initialize starting points
     let line1X = 0
     let line1Y = 0
     let line2X = 0
@@ -53,74 +51,68 @@ function drawLines() {
         "L": -1
     }
 
-    let line1Coords = [{
-        x: line1X,
-        y: line1Y
-    }]
+    // use Map() object instead of array
+    // this solves O(n2) issue by comparing two objects rather than
+    // using nested loops
 
-    let line2Coords = [{
-        x: line2X,
-        y: line2Y
-    }]
+    let line1Coords = new Map()
+    let line2Coords = new Map()
 
     line1Directions.forEach((set,idx)=>{
-        debugger;
         if (set.direction === 'R' || set.direction === 'L') {
             for (let i = 0; i < Number(set.distance); i++) {
                 line1X += vals[set.direction];
-                line1Coords.push({
-                    x: line1X,
-                    y: line1Y
-                })
+                line1Coords.set(`X${line1X}Y${line1Y}`,line1Coords.size)
             }
         } else {
             for (let i = 0; i < Number(set.distance); i++) {
                 line1Y += vals[set.direction];
-                line1Coords.push({
-                    x: line1X,
-                    y: line1Y
-                })
+                line1Coords.set(`X${line1X}Y${line1Y}`,line1Coords.size)
             }
         }
     }
     )
 
     line2Directions.forEach((set,idx)=>{
-        debugger;
         if (set.direction === 'R' || set.direction === 'L') {
             for (let i = 0; i < Number(set.distance); i++) {
-                line2X += vals[set.direction];
-                line2Coords.push({
-                    x: line2X,
-                    y: line2Y
-                })
+              line2X += vals[set.direction];
+              line2Coords.set(`X${line2X}Y${line2Y}`,line2Coords.size)
             }
         } else {
             for (let i = 0; i < Number(set.distance); i++) {
                 line2Y += vals[set.direction];
-                line2Coords.push({
-                    x: line2X,
-                    y: line2Y
-                })
+                line2Coords.set(`X${line2X}Y${line2Y}`,line2Coords.size)
             }
         }
     }
     )
 
-    let intersections = []
+    let intersections = getIntersections(line1Coords, line2Coords)
 
-    line1Coords.forEach((coord)=>{
-        for (let i = 0; i < line2Coords.length; i++) {
-            if (coord.x === line2Coords[i].x && coord.y === line2Coords[i].y) {
-                intersections.push(coord)
-            }
-
-        }
-    }
-    )
-
-    return intersections.map((coords) => { return Math.abs((coords.x) + (coords.y))})
-
+    return getShortestManhattanDistance(intersections)
 }
 
-console.log(drawLines())
+function getIntersections(line1, line2) {
+  let intersections = []
+
+  for (let key of line1) {
+    if (line2.has(key[0]))
+    intersections.push(`${key[0]}`)
+  }
+
+  return intersections;
+}
+
+function getShortestManhattanDistance(intersections) {
+  return intersections.reduce((acc,cur) => {
+    let parsedString = cur.split(/[XY]/)
+    let X = parsedString[parsedString.length-2]
+    let Y = parsedString[parsedString.length-1]
+    let manhattanDistance = Math.abs(Number(X)) + Math.abs(Number(Y))
+    if (manhattanDistance < acc) return manhattanDistance;
+    return acc;
+  },Infinity)
+}
+
+console.log(solve())
