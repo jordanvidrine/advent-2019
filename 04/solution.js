@@ -58,7 +58,7 @@ function butNotBiggerThanTwo(number) {
     }
   })
 
-  for ( let key in capturedNumbers) {
+  for (let key in capturedNumbers) {
     if (capturedNumbers[key] === 2) return true
   }
 
