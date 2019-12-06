@@ -29,7 +29,8 @@ function isGoodPassword(number, start, end) {
   if (
       number.toString().length === 6
       && number >= start && number <= end
-      && twoAdjacentDigits(number)
+      // && twoAdjacentDigits(number)
+      && butNotBiggerThanTwo(number)
       && digitsNeverDecrease(number)
      ) return true
   return false;
@@ -44,6 +45,26 @@ function twoAdjacentDigits(number) {
   })
 }
 
+function butNotBiggerThanTwo(number) {
+  let capturedNumbers = {}
+
+  number = number.toString().split('')
+
+  number.forEach((digit) => {
+    if (!(digit in capturedNumbers)) {
+      capturedNumbers[digit] = 1
+    } else {
+      capturedNumbers[digit]++
+    }
+  })
+
+  for ( let key in capturedNumbers) {
+    if (capturedNumbers[key] === 2) return true
+  }
+
+  return false;
+}
+
 function digitsNeverDecrease(number) {
   let splitStr = number.toString().split('')
   return splitStr.every((number, idx) => {
@@ -55,3 +76,4 @@ function digitsNeverDecrease(number) {
 }
 
 console.log(howManyDiffPasswords(RangeStart,RangeEnd))
+// console.log(butNotBiggerThanTwo(1111222))
