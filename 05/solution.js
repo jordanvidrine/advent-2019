@@ -16,6 +16,22 @@ const getInput = () => {
 // Opcode 4 = outputs the value of its only parameter.
 // For example, the instruction 4,50 would output the value at address 50.
 
+// Opcode 5 = Jump-if-true
+// if the first param is non 0, it sets the instruction pointer to the value from the second
+// parameter, otherwise it does nothing
+
+// Opcode 6 = Jump-if-false
+// if the first param is 0, it sets the instruction pointer to the value from the second parameter
+// otherwise it does nothing
+
+// Opcode 7 =  less than
+// if the first param is less than the second param, it stores 1 in the position given by the third
+// param, otherwise it stores 0
+
+// Opcode 8 = equals
+// if the first poaram is equal to the second param, it stores 1 in the position given by the third
+// param, otherwise it stores 0
+
 // Add Parameter mode functionality
 // currently the program only operates with 0, Position Mode
 // values are interpredted as positions IE. 55, means value at position 55
@@ -67,12 +83,16 @@ const getInput = () => {
 // This final output isn't an error; an output followed immediately by a halt means the program finished.
 // If all outputs were zero except the diagnostic code, the diagnostic program ran successfully.
 
-function intCodeComp(userInput) {
-   var instructions = getInput()
-   // var instructions = [1002,4,3,4,33]
+// change getDistance to output the new instruction pointer or mimic old version
+// if instruction = 5,6,7,8 do something different, otherwise, return i + new i
 
-  for (let i = 0; instructions[i] !== 99; i += getDistance(instructions[i])) {
+function intCodeComp(userInput) {
+    var instructions = getInput()
+
+    for ( let i = 0; instructions[i] !== 99; i = getInstructionPointer(instructions[i], i, instructions)) {
+
     let currentInstruction = instructions[i]
+
     if (currentInstruction === 3) {
       instructions[instructions[i+1]] = userInput
     } else {
@@ -86,6 +106,7 @@ function intCodeComp(userInput) {
       currentInstruction = getOpCodeAndParams(currentInstruction);
 
       if (currentInstruction.opCode === '01') {
+        // checks for immediate mode vs position mode
         let input1 = currentInstruction.paramMode1 === '1' ? instructions[i+1] : instructions[instructions[i+1]]
         let input2 = currentInstruction.paramMode2 === '1' ? instructions[i+2] : instructions[instructions[i+2]]
         let storage = instructions[i+3]
@@ -102,6 +123,34 @@ function intCodeComp(userInput) {
       if (currentInstruction.opCode === '04') {
         let input1 = currentInstruction.paramMode1 === '1' ? instructions[i+1] : instructions[instructions[i+1]]
         console.log(input1)
+      }
+
+      if (currentInstruction.opCode === '07') {
+        let input1 = currentInstruction.paramMode1 === '1' ? instructions[i+1] :
+        instructions[instructions[i+1]]
+        let input2 = currentInstruction.paramMode2 === '1' ? instructions[i+2] : instructions[instructions[i+2]]
+
+        let storage = instructions[i+3]
+
+        if (input1 < input2) {
+          instructions[storage] = 1;
+        } else {
+          instructions[storage] = 0;
+        }
+      }
+
+      if (currentInstruction.opCode === '08') {
+        let input1 = currentInstruction.paramMode1 === '1' ? instructions[i+1] :
+        instructions[instructions[i+1]]
+        let input2 = currentInstruction.paramMode2 === '1' ? instructions[i+2] : instructions[instructions[i+2]]
+
+        let storage = instructions[i+3]
+
+        if (input1 === input2) {
+          instructions[storage] = 1;
+        } else {
+          instructions[storage] = 0;
+        }
       }
 
     }
@@ -122,16 +171,42 @@ function getOpCodeAndParams(instruction) {
 
 }
 
-function getDistance(param) {
-  param = param.toString();
+function getInstructionPointer(instruction, i, instructions) {
+  instruction = prepender(instruction.toString())
+  let opCodeAndParams = getOpCodeAndParams(instruction)
+
   if (
-      param[param.length-1] === '3'
-      || param[param.length-1] === '4'
-     ) return 2
+      opCodeAndParams.opCode === '03'
+      || opCodeAndParams.opCode === '04'
+  ) return i + 2
   if (
-      param[param.length-1] === '1'
-      || param[param.length-1] === '2'
-     ) return 4
+      opCodeAndParams.opCode === '01'
+      || opCodeAndParams.opCode === '02'
+      || opCodeAndParams.opCode === '07'
+      || opCodeAndParams.opCode === '08'
+  ) return i + 4
+
+  if (opCodeAndParams.opCode === '05') {
+    let input1 = opCodeAndParams.paramMode1 === '1' ? instructions[i+1] : instructions[instructions[i+1]]
+    let input2 = opCodeAndParams.paramMode2 === '1' ? instructions[i+2] : instructions[instructions[i+2]]
+
+    if (input1 !== 0) {
+      return input2
+    } else {
+      return i + 3
+    }
+  }
+
+  if (opCodeAndParams.opCode === '06') {
+    let input1 = opCodeAndParams.paramMode1 === '1' ? instructions[i+1] : instructions[instructions[i+1]]
+    let input2 = opCodeAndParams.paramMode2 === '1' ? instructions[i+2] : instructions[instructions[i+2]]
+
+    if (input1 === 0) {
+      return input2
+    } else {
+      return i + 3
+    }
+  }
 }
 
 function prepender(instruction) {
@@ -146,5 +221,6 @@ function prepender(instruction) {
   return instruction
 }
 
-console.log(intCodeComp(1))
+console.log(intCodeComp(5))
 // console.log(prepender(101))
+// console.log(getInstructionPointer(3))
