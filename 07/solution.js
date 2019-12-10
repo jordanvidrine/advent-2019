@@ -1,7 +1,7 @@
 var combinatorics = require('js-combinatorics')
 const fs = require('fs')
 
-cmb = combinatorics.permutation([0,1,2,3,4]);
+cmb = combinatorics.permutation([5,6,7,8,9]);
 let phaseSettings = cmb.toArray()
 
 const getInput = () => {
@@ -11,9 +11,7 @@ const getInput = () => {
 
 function amplifierController() {
   let highestCode = -Infinity;
-
   for (let i = 0; i < phaseSettings.length; i++) {
-
     let currentPhase = phaseSettings[i]
 
     let A = intCodeComp([currentPhase[0], 0])
@@ -29,13 +27,26 @@ function amplifierController() {
   return highestCode;
 }
 
+function amplifierFeedbackController(phase) {
+// part 2 solution
+}
+
+function getHighestFeedbackPhase() {
+// part 2 solution
+}
+
 function intCodeComp(userInput) {
     var instructions = getInput()
     let inputIndex = 0;
+    let output = undefined;
 
-    for ( let i = 0; instructions[i] !== 99; i = getInstructionPointer(instructions[i], i, instructions)) {
+    for ( let i = 0; instructions[i] < instructions.length; i = getInstructionPointer(instructions[i], i, instructions)) {
 
     let currentInstruction = instructions[i]
+
+    if (currentInstruction == 99) {
+      return output;
+    }
 
     if (currentInstruction === 3) {
       instructions[instructions[i+1]] = userInput[inputIndex]
@@ -67,7 +78,7 @@ function intCodeComp(userInput) {
 
       if (currentInstruction.opCode === '04') {
         let input1 = currentInstruction.paramMode1 === '1' ? instructions[i+1] : instructions[instructions[i+1]]
-        return input1
+        output = input1
       }
 
       if (currentInstruction.opCode === '07') {
