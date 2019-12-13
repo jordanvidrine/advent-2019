@@ -85,6 +85,9 @@ function multDigits(layer) {
     return ones * twos
 }
 
+// PART ONE ANSWER
+// console.log(multDigits(getTargetLayer()))
+
 // PART TWO
 
 function blankImage(layers) {
@@ -102,12 +105,6 @@ function blankImage(layers) {
     }
 
     return blankImage
-}
-
-function buildImage(layers) {
-    let blankImage = blankImage(layers)
-
-    let imageMap = imageMap(layers)
 }
 
 function imageMap(layers) {
@@ -129,7 +126,43 @@ function imageMap(layers) {
         }
 
     }
+
     return imageMap
 }
 
-// console.log(multDigits(getTargetLayer()))
+
+function buildImage(layers) {
+    let map = imageMap(layers)
+    let blank = blankImage(layers)
+
+    for (let coords in map) {
+
+        let x = coords.split(',')[0]
+        let y = coords.split(',')[1]
+
+        let reducedValue = reduceLayers(map[coords].reverse())
+
+        blank[y][x] = reducedValue;
+    }
+
+    return blank;
+}
+
+function reduceLayers(layer) {
+    let value = layer.reduce((acc,current) => {
+        if (current === 2) {
+            return acc;
+        } else if (current === 1) {
+            acc = '#';
+            return acc;
+        } else {
+            acc = ' ';
+            return acc;
+        }
+    }, 2)
+
+    return value;
+}
+
+
+console.table(buildImage(createLayers(25,6)))
