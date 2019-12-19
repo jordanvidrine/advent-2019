@@ -288,4 +288,4 @@ function prepender(instruction) {
   return instruction
 }
 
-console.log(intCodeComp(getInput(),1))
+console.log(intCodeComp(getInput(),2))
